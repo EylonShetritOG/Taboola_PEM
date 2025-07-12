@@ -9,7 +9,7 @@ class MyApplication : Application() {
         super.onCreate()
 
         try {
-            // Initialize Taboola SDK with correct publisher ID
+            // Initialize Taboola SDK
             val publisherInfo = TBLPublisherInfo("sdk-tester-rnd")
             Taboola.init(publisherInfo)
             println("Taboola initialized successfully!")

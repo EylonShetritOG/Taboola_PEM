@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
-        <!-- This is the splash screen (welcome) -->
+        <!-- Splash screen (welcome) -->
         <activity
             android:name=".WelcomeActivity"
             android:exported="true">

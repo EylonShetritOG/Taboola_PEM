@@ -19,8 +19,8 @@ class ArticleAdapter(
         private const val VIEW_TYPE_ARTICLE = 0
         private const val VIEW_TYPE_TABOOLA_WIDGET = 1
         private const val VIEW_TYPE_TABOOLA_FEED = 2
-        private const val TABOOLA_WIDGET_POSITION = 2  // Position 3 (0-indexed)
-        private const val TABOOLA_FEED_POSITION = 9    // Position 10 (0-indexed, adjusted for widget)
+        private const val TABOOLA_WIDGET_POSITION = 2  // Position 3
+        private const val TABOOLA_FEED_POSITION = 9    // Position 10
     }
 
     private var classicPage: TBLClassicPage? = null
@@ -114,7 +114,7 @@ class ArticleAdapter(
                         taboolaUnit,
                         "Mid Article",
                         "alternating-widget-without-video",
-                        0, // Widget placement type
+                        0,
                         null
                     )
                     taboolaUnit.fetchContent()
@@ -139,7 +139,7 @@ class ArticleAdapter(
                         taboolaFeedUnit,
                         "Feed_without_video",
                         "thumbs-feed-01",
-                        2, // Feed placement type (try 2 for FEED)
+                        2,
                         null
                     )
                     taboolaFeedUnit.fetchContent()
