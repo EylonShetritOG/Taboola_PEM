@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:taboola="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="#ffffff">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Recommended for You"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:layout_marginBottom="8dp" />
+
+    <FrameLayout
+        android:id="@+id/taboola_feed_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="400dp">
+
+        <com.taboola.android.TBLClassicUnit
+            android:id="@+id/taboola_feed_unit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            taboola:tb_mode="thumbs-feed-01"
+            taboola:tb_placement="Feed without video"
+            taboola:tb_target_type="mix" />
+
+    </FrameLayout>
+
+</LinearLayout>

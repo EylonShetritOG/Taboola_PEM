@@ -17,17 +17,19 @@ class ArticleAdapter(
 
     companion object {
         private const val VIEW_TYPE_ARTICLE = 0
-        private const val VIEW_TYPE_TABOOLA = 1
-        private const val TABOOLA_POSITION = 2
+        private const val VIEW_TYPE_TABOOLA_WIDGET = 1
+        private const val VIEW_TYPE_TABOOLA_FEED = 2
+        private const val TABOOLA_WIDGET_POSITION = 2  // Position 3 (0-indexed)
+        private const val TABOOLA_FEED_POSITION = 9    // Position 10 (0-indexed, adjusted for widget)
     }
 
     private var classicPage: TBLClassicPage? = null
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == TABOOLA_POSITION) {
-            VIEW_TYPE_TABOOLA
-        } else {
-            VIEW_TYPE_ARTICLE
+        return when (position) {
+            TABOOLA_WIDGET_POSITION -> VIEW_TYPE_TABOOLA_WIDGET
+            TABOOLA_FEED_POSITION -> VIEW_TYPE_TABOOLA_FEED
+            else -> VIEW_TYPE_ARTICLE
         }
     }
 
@@ -37,24 +39,45 @@ class ArticleAdapter(
                 val view = LayoutInflater.from(parent.context).inflate(R.layout.item_article, parent, false)
                 ArticleViewHolder(view)
             }
-            VIEW_TYPE_TABOOLA -> {
+            VIEW_TYPE_TABOOLA_WIDGET -> {
                 val view = LayoutInflater.from(parent.context).inflate(R.layout.item_taboola, parent, false)
-                TaboolaViewHolder(view)
+                TaboolaWidgetViewHolder(view)
+            }
+            VIEW_TYPE_TABOOLA_FEED -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_taboola_feed, parent, false)
+                TaboolaFeedViewHolder(view)
             }
             else -> throw IllegalArgumentException("Invalid view type")
         }
     }
 
-    override fun getItemCount(): Int = articles.size + 1
+    override fun getItemCount(): Int {
+        // Add 2 for the Taboola widget and feed
+        return articles.size + 2
+    }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is ArticleViewHolder -> {
-                val articlePosition = if (position > TABOOLA_POSITION) position - 1 else position
+                // Adjust article position because we inserted Taboola items
+                val articlePosition = when {
+                    position < TABOOLA_WIDGET_POSITION -> position
+                    position < TABOOLA_FEED_POSITION -> position - 1
+                    else -> position - 2
+                }
                 val article = articles[articlePosition]
                 holder.bind(article)
             }
-            is TaboolaViewHolder -> {
+            is TaboolaWidgetViewHolder -> {
+                if (classicPage == null) {
+                    classicPage = Taboola.getClassicPage(
+                        "https://blog.taboola.com/",
+                        "article"
+                    )
+                }
+                holder.bind(classicPage!!)
+            }
+            is TaboolaFeedViewHolder -> {
                 if (classicPage == null) {
                     classicPage = Taboola.getClassicPage(
                         "https://blog.taboola.com/",
@@ -78,7 +101,7 @@ class ArticleAdapter(
         }
     }
 
-    class TaboolaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class TaboolaWidgetViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val container: View = view.findViewById(R.id.taboola_container)
 
         fun bind(classicPage: TBLClassicPage) {
@@ -86,18 +109,43 @@ class ArticleAdapter(
                 val taboolaUnit = container.findViewById<TBLClassicUnit>(R.id.taboola_unit)
 
                 if (taboolaUnit != null) {
-                    // Use the addUnitToPage method with correct values
+                    // Widget configuration
                     classicPage.addUnitToPage(
                         taboolaUnit,
-                        "Mid_Article",
+                        "Mid Article",
                         "alternating-widget-without-video",
-                        0, // Try 0, 1, or 2 for different placement types
-                        null // No listener for now
+                        0, // Widget placement type
+                        null
                     )
                     taboolaUnit.fetchContent()
                 }
             } catch (e: Exception) {
-                println("Error setting up Taboola: ${e.message}")
+                println("Error setting up Taboola Widget: ${e.message}")
+                e.printStackTrace()
+            }
+        }
+    }
+
+    class TaboolaFeedViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val container: View = view.findViewById(R.id.taboola_feed_container)
+
+        fun bind(classicPage: TBLClassicPage) {
+            try {
+                val taboolaFeedUnit = container.findViewById<TBLClassicUnit>(R.id.taboola_feed_unit)
+
+                if (taboolaFeedUnit != null) {
+                    // Feed configuration
+                    classicPage.addUnitToPage(
+                        taboolaFeedUnit,
+                        "Feed_without_video",
+                        "thumbs-feed-01",
+                        2, // Feed placement type (try 2 for FEED)
+                        null
+                    )
+                    taboolaFeedUnit.fetchContent()
+                }
+            } catch (e: Exception) {
+                println("Error setting up Taboola Feed: ${e.message}")
                 e.printStackTrace()
             }
         }
